@@ -77,6 +77,9 @@ namespace VSPWebApi.API.Database.Models
              public decimal longitude { get; set; }
              public decimal latitudeDelta { get; set; }
              public decimal longitudeDelta { get; set; }
+             public string? eczanetelefon { get; set; }
+             public string? eczaneismi { get; set; }
+             public string? eczaneadress { get; set; }
         }
 
 
@@ -85,7 +88,6 @@ namespace VSPWebApi.API.Database.Models
         {
             public int userid { get; set; }
             public int productid { get; set; }
-
         }
     }
 }
