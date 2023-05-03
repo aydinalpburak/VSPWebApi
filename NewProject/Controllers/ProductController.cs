@@ -48,6 +48,7 @@ namespace NewProject.API.Controllers
             }
 
         }
+
         [HttpGet("getAllProducts")]
         public IActionResult getAllProducts()
         {
@@ -88,7 +89,7 @@ namespace NewProject.API.Controllers
                     var response = new returnClassModel()
                     {
                         message = "Islem Basarili Bir Sekilde Gerceklesti",
-                        response = "Arac Basarili Bir Sekilde Eklendi",
+                        response = "Urun Basarili Bir Sekilde Eklendi",
                         status_code = Ok().StatusCode.ToString(),
                     };
                     return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));

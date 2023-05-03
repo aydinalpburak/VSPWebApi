@@ -54,6 +54,8 @@ namespace VSPWebApi.API.Database.Models
             [Column(TypeName = "jsonb")]
             public Recipe recipe { get; set; }
             public string video { get; set; }
+
+            public string price { get; set; }
         }
 
         public class Root2
