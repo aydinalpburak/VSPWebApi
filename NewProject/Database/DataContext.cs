@@ -41,18 +41,18 @@ namespace NewProject.Database
 
         }
 
-        // public DbSet<teklifClassModel> teklifTablosu { get;  set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Root> mytable { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Favori> favoriler { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.EczaneKonumlari> eczanekonumlari { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Receteler> receteler { get; set; } = null!;
+        public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Eczaneler> eczanevestokbilgisi { get; set; } = null!;
 
 
 
         public DataContext()
         {
         }
-        
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -69,10 +69,10 @@ namespace NewProject.Database
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-         
-                    
-                   
-                    
+
+
+
+
         }
     }
 }

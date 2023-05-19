@@ -76,6 +76,8 @@ namespace VSPWebApi.API.Database.Models
         {
             public int userid { get; set; }
             public int productid { get; set; }
+            public int? pharmacyid { get; set; }
+
         }
         public class RecetelerDTO
         {
@@ -93,6 +95,21 @@ namespace VSPWebApi.API.Database.Models
             public IList<Ilaclar> ilaclar { get; set; }
         }
         public class Ilaclar
+        {
+            public int? id { get; set; }
+            public int? count { get; set; }
+        }
+        public class Eczaneler
+        {
+            [Key]
+            public int eczaneid { get; set; }
+            public string isim { get; set; }
+
+            [Column(TypeName = "jsonb")]
+            public IList<StokBilgisi> ilacvestok { get; set; }
+        }
+       
+        public class StokBilgisi
         {
             public int? id { get; set; }
             public int? count { get; set; }

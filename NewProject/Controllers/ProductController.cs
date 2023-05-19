@@ -75,6 +75,34 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpGet("getEczane")]
+        public IActionResult getEczane(int id)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.eczanevestokbilgisi.ToList();
+                    getFromDb = getFromDb.Where(e => e.ilacvestok.Any(i => i.id == id && i.count > 0)).ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+
         [HttpPost("addNewProduct")]
         public async Task<IActionResult> AddNewProduct(Root data)
         {
@@ -141,10 +169,12 @@ namespace NewProject.API.Controllers
                 string connectionString = "Server=databasepharmacy.ckugpbwqwvch.eu-central-1.rds.amazonaws.com;Port=5432;Database=pharmacyMain;User ID=squezzoo;Password=burak3845;";
                 NpgsqlConnection connection = new NpgsqlConnection(connectionString);
                 connection.Open();
-                string sql = "INSERT INTO favoriler (userid,productid) VALUES (@val1,@val2);";
+                string sql = "INSERT INTO favoriler (userid,productid,pharmacyid) VALUES (@val1,@val2,@val3);";
                 NpgsqlCommand command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@val1", data.userid);
                 command.Parameters.AddWithValue("@val2", data.productid);
+                command.Parameters.AddWithValue("@val3", data.pharmacyid);
+
                 command.ExecuteNonQuery();
                 connection.Close();
                 var response = new returnClassModel()
