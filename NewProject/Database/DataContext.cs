@@ -45,6 +45,7 @@ namespace NewProject.Database
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Root> mytable { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Favori> favoriler { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.EczaneKonumlari> eczanekonumlari { get; set; } = null!;
+        public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.Receteler> receteler { get; set; } = null!;
 
 
 
