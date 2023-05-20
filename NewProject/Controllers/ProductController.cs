@@ -102,7 +102,6 @@ namespace NewProject.API.Controllers
 
         }
 
-
         [HttpPost("addNewProduct")]
         public async Task<IActionResult> AddNewProduct(Root data)
         {
@@ -131,6 +130,86 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpPost("makeOrder")]
+        public async Task<IActionResult> makeOrder(Orders data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    db.orders.AddAsync(data);
+                    await db.SaveChangesAsync();
+
+                    var response = new returnClassModel()
+                    {
+                        message = "Islem Basarili Bir Sekilde Gerceklesti",
+                        response = "Urun Basarili Bir Sekilde Eklendi",
+                        status_code = Ok().StatusCode.ToString(),
+                    };
+                    return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.InnerException);
+                }
+
+            }
+
+        }
+
+        [HttpPost("postLogin")]
+        public async Task<IActionResult> makeOrder(UserLoginDTO data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    var getFromDb = db.users.Where(item => item.password == data.password && item.email==data.email).ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.InnerException);
+                }
+
+            }
+
+        }
+
+        [HttpGet("getOrders")]
+        public IActionResult getOrders(int pharmacyid)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.orders.ToList();
+                    List<Orders> filteredOrders = new List<Orders>();
+                    getFromDb.ForEach(order =>
+                    {
+                        order.medicines = order.medicines.Where(med => med.pharmacyid == pharmacyid).ToList();
+                        filteredOrders.Add(order);
+                    });
+                    return Ok(JsonConvert.SerializeObject(filteredOrders, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpGet("getFavoritesProducts")]
         public IActionResult getFavoritesProducts(int id)
         {
@@ -144,11 +223,20 @@ namespace NewProject.API.Controllers
 
                 using (var db = new DataContext())
                 {
-                    List<int> vs = new List<int>();
-                    var favoriIdler = db.favoriler.Where(s => s.userid == id).ToList();
-                    favoriIdler.ForEach(item => vs.Add((int)item.productid));
-                    var getFromDb = db.mytable.Where(item => vs.Contains(item.id));
-                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+
+                  var result = db.mytable
+                  .Join(db.favoriler,
+                      t1 => t1.id,
+                      t2 => t2.productid,
+                      (t1, t2) => new { T1 = t1, T2 = t2 })
+                  .Where(x => x.T2.userid == id)
+                  .ToList();
+                   return Ok(JsonConvert.SerializeObject(result, Formatting.Indented));
+                    //List<int> vs = new List<int>();
+                    //var favoriIdler = db.favoriler.Where(s => s.userid == id).ToList();
+                    //favoriIdler.ForEach(item => vs.Add((int)item.productid));
+                    //var getFromDb = db.mytable.Where(item => vs.Contains(item.id));
+                    //return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
 
             }
@@ -192,6 +280,7 @@ namespace NewProject.API.Controllers
             }
 
         }
+
         [HttpPost("deleteFavoriteProduct")]
         public async Task<IActionResult> deleteFavoriteProduct(Favori data)
         {
@@ -205,6 +294,36 @@ namespace NewProject.API.Controllers
                 NpgsqlCommand command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@val1", data.userid);
                 command.Parameters.AddWithValue("@val2", data.productid);
+                command.ExecuteNonQuery();
+                connection.Close();
+                var response = new returnClassModel()
+                {
+                    message = "Islem Basarili Bir Sekilde Gerceklesti",
+                    response = "Arac Basarili Bir Sekilde Silindi",
+                    status_code = Ok().StatusCode.ToString(),
+                };
+                return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpGet("deleteAllFavoriteProduct")]
+        public async Task<IActionResult> deleteFavoriteProduct(int userid)
+        {
+
+            try
+            {
+                string connectionString = "Server=databasepharmacy.ckugpbwqwvch.eu-central-1.rds.amazonaws.com;Port=5432;Database=pharmacyMain;User ID=squezzoo;Password=burak3845;";
+                NpgsqlConnection connection = new NpgsqlConnection(connectionString);
+                connection.Open();
+                string sql = "DELETE FROM favoriler where userid=@val1";
+                NpgsqlCommand command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@val1", userid);
                 command.ExecuteNonQuery();
                 connection.Close();
                 var response = new returnClassModel()

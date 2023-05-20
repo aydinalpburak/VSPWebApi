@@ -108,11 +108,49 @@ namespace VSPWebApi.API.Database.Models
             [Column(TypeName = "jsonb")]
             public IList<StokBilgisi> ilacvestok { get; set; }
         }
-       
+
         public class StokBilgisi
         {
             public int? id { get; set; }
             public int? count { get; set; }
+        }
+        public class Orders
+        {
+            [Key]
+            public long orderid { get; set; }
+            public string adress { get; set; }
+
+            [Column(TypeName = "jsonb")]
+            public IList<StokBilgisiSparis> medicines { get; set; }
+
+            public int userid { get; set; }
+        }
+        public class StokBilgisiSparis
+        {
+            public int? id { get; set; }
+            public int? count { get; set; }
+            public string? price { get; set; }
+            public int? pharmacyid { get; set; }
+        }
+        public class UserLogin 
+        {
+            public string? accesslevel { get; set; }
+            public string? name { get; set; }
+            public string? surname { get; set; }
+            public string? prescriptionInfo { get; set; }
+            [Key]        
+            public string tc { get; set; }
+            public string? password { get; set; }
+            public string? address { get; set; }
+
+            public int id { get; set; }
+            public string? email { get; set; }
+            public string? phonenumber { get; set; }
+        }
+        public class UserLoginDTO
+        {
+            public string email { get; set; }
+            public string password { get; set; }
         }
     }
 }
