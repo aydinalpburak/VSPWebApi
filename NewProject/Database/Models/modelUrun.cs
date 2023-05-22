@@ -118,12 +118,14 @@ namespace VSPWebApi.API.Database.Models
         {
             [Key]
             public long orderid { get; set; }
-            public string adress { get; set; }
+            public string? adress { get; set; }
 
             [Column(TypeName = "jsonb")]
             public IList<StokBilgisiSparis> medicines { get; set; }
 
             public int userid { get; set; }
+
+            public string? ordertype { get; set; }
         }
         public class StokBilgisiSparis
         {
@@ -151,6 +153,14 @@ namespace VSPWebApi.API.Database.Models
         {
             public string email { get; set; }
             public string password { get; set; }
+        }
+        public class MyTableToWpf
+        {
+            public int id { get; set; }
+            public string? name { get; set; }
+            public string? description { get; set; }
+            public string? author { get; set; }
+            public string? image1 { get; set; }
         }
     }
 }

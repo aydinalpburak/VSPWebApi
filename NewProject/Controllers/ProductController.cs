@@ -75,6 +75,40 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpGet("getAllProductsWpf")]
+        public IActionResult getAllProductsWpf()
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.mytable
+                        .Select(x => new MyTableToWpf { 
+                            author = x.author,
+                            description = x.description,
+                            id = x.id,
+                            image1 = x.image1,
+                            name = x.name
+                        })
+                        .ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpGet("getEczane")]
         public IActionResult getEczane(int id)
         {
@@ -196,9 +230,38 @@ namespace NewProject.API.Controllers
                     getFromDb.ForEach(order =>
                     {
                         order.medicines = order.medicines.Where(med => med.pharmacyid == pharmacyid).ToList();
-                        filteredOrders.Add(order);
+                        if (order.medicines.Count > 0)
+                        {
+                            filteredOrders.Add(order);
+                        }
                     });
                     return Ok(JsonConvert.SerializeObject(filteredOrders, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpGet("getOrdersForUsers")]
+        public IActionResult getOrdersForUsers(int userid)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.orders.Where(item => item.userid == userid).ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
 
             }
@@ -223,7 +286,6 @@ namespace NewProject.API.Controllers
 
                 using (var db = new DataContext())
                 {
-
                   var result = db.mytable
                   .Join(db.favoriler,
                       t1 => t1.id,
@@ -232,11 +294,6 @@ namespace NewProject.API.Controllers
                   .Where(x => x.T2.userid == id)
                   .ToList();
                    return Ok(JsonConvert.SerializeObject(result, Formatting.Indented));
-                    //List<int> vs = new List<int>();
-                    //var favoriIdler = db.favoriler.Where(s => s.userid == id).ToList();
-                    //favoriIdler.ForEach(item => vs.Add((int)item.productid));
-                    //var getFromDb = db.mytable.Where(item => vs.Contains(item.id));
-                    //return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
 
             }
@@ -251,27 +308,60 @@ namespace NewProject.API.Controllers
         [HttpPost("addNewFavoriteProduct")]
         public async Task<IActionResult> AddNewFavoriteProduct(Favori data)
         {
-
+            bool isInDB = false;
             try
             {
                 string connectionString = "Server=databasepharmacy.ckugpbwqwvch.eu-central-1.rds.amazonaws.com;Port=5432;Database=pharmacyMain;User ID=squezzoo;Password=burak3845;";
                 NpgsqlConnection connection = new NpgsqlConnection(connectionString);
                 connection.Open();
-                string sql = "INSERT INTO favoriler (userid,productid,pharmacyid) VALUES (@val1,@val2,@val3);";
-                NpgsqlCommand command = new NpgsqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@val1", data.userid);
-                command.Parameters.AddWithValue("@val2", data.productid);
-                command.Parameters.AddWithValue("@val3", data.pharmacyid);
-
-                command.ExecuteNonQuery();
-                connection.Close();
-                var response = new returnClassModel()
+                //once var mi kontrol etmelisin
+                string sqlGet = "SELECT * FROM favoriler WHERE userid=@val1 and productid=@val2 and pharmacyid=@val3;";
+                using (NpgsqlCommand command1 = new NpgsqlCommand(sqlGet, connection))
                 {
-                    message = "Islem Basarili Bir Sekilde Gerceklesti",
-                    response = "Arac Basarili Bir Sekilde Eklendi",
-                    status_code = Ok().StatusCode.ToString(),
-                };
-                return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                    command1.Parameters.AddWithValue("@val1", data.userid);
+                    command1.Parameters.AddWithValue("@val2", data.productid);
+                    command1.Parameters.AddWithValue("@val3", data.pharmacyid);
+                    NpgsqlDataReader reader = command1.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        isInDB = true;
+                        break;
+                    }
+                    reader.Close();
+                }
+
+
+                //--------------------------------------------------------------------------------------------------------------
+                if (!isInDB)
+                {
+
+                    string sql = "INSERT INTO favoriler (userid,productid,pharmacyid) VALUES (@val1,@val2,@val3);";
+                    NpgsqlCommand command = new NpgsqlCommand(sql, connection);
+                    command.Parameters.AddWithValue("@val1", data.userid);
+                    command.Parameters.AddWithValue("@val2", data.productid);
+                    command.Parameters.AddWithValue("@val3", data.pharmacyid);
+
+                    command.ExecuteNonQuery();
+                    connection.Close();
+                    var response = new returnClassModel()
+                    {
+                        message = "Islem Basarili Bir Sekilde Gerceklesti",
+                        response = "Ilac Basarili Bir Sekilde Eklendi",
+                        status_code = Ok().StatusCode.ToString(),
+                    };
+                    return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                }
+                else
+                {
+                    var response = new returnClassModel()
+                    {
+                        message = "Ilac Zaten DB de bulunuyor",
+                        response = "Ilac Zaten DB de bulunuyor",
+                        status_code = NoContent().StatusCode.ToString(),
+                    };
+                    return NoContent();
+                }
+
 
             }
             catch (Exception ex)
