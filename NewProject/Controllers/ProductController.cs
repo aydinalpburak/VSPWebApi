@@ -7,7 +7,10 @@ using VSPWebApi.API.Database.Models;
 using VSPWebApi.API.Database.Models.eczane_tracker;
 using Microsoft.Data.SqlClient;
 using System.Linq;
+using System.Net.Mail;
 using Npgsql;
+using System.Net;
+//using System.Web.Security;
 
 namespace NewProject.API.Controllers
 {
@@ -231,6 +234,34 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpPost("addNewUsers")]
+        public async Task<IActionResult> AddNewUsers(UserLogin data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    db.users.AddAsync(data);
+                    await db.SaveChangesAsync();
+
+                    var response = new returnClassModel()
+                    {
+                        message = "Islem Basarili Bir Sekilde Gerceklesti",
+                        response = "Urun Basarili Bir Sekilde Eklendi",
+                        status_code = Ok().StatusCode.ToString(),
+                    };
+                    return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+
+        }
+
         [HttpPost("makeOrder")]
         public async Task<IActionResult> makeOrder(Orders data)
         {
@@ -260,7 +291,7 @@ namespace NewProject.API.Controllers
         }
 
         [HttpPost("postLogin")]
-        public async Task<IActionResult> makeOrder(UserLoginDTO data)
+        public async Task<IActionResult> postLogin(UserLoginDTO data)
         {
             using (var db = new DataContext())
             {
@@ -268,6 +299,26 @@ namespace NewProject.API.Controllers
                 try
                 {
                     var getFromDb = db.users.Where(item => item.password == data.password && item.email==data.email).ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.InnerException);
+                }
+
+            }
+
+        }
+
+        [HttpPost("postLoginPharmacy")]
+        public async Task<IActionResult> postLoginPharmacy(UserLoginWpfDTO data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    var getFromDb = db.pharmacists.Where(item => item.eczanesifre == data.password && item.eczaneid == data.id).ToList();
                     return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
                 catch (Exception ex)
@@ -530,5 +581,145 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpGet("getUserNameFromUserId")]
+        public IActionResult getUserNameFromUserId(int userId)
+        {
+            try
+            {
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.users.First(item => item.id == userId);
+                    if (getFromDb != null)
+                    {
+                        var stringResult = getFromDb.name + " " + getFromDb.surname;
+                        return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpGet("getSendMailPass")]
+        public IActionResult getSendMailPass(string email)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.users.Any(item => item.email == email);
+                    if (getFromDb)
+                    {
+                        var tempObject = db.users.First(item => item.email == email);
+                        string passString = "Merhaba " + tempObject.name+" "+ tempObject.surname +","+"\n\n" +
+                        "Şifreniz: " + tempObject.password +
+                        "\n\nUygulamaya giriş yaptıktan sonra lütfen şifrenizi değiştiriniz!" +
+                        "\n\n\nSağlıklı günler dileriz." +
+                        "\n\n\n\ne-CZANEM";
+                        Email(passString, tempObject.email);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        public static void Email(string yazi, string userEmail)
+        {
+            try
+            {
+                {
+                    var fromAddress = new MailAddress("saglikli.yasama.basla@gmail.com", "e-CZANEM");
+
+                    var toAddress = new MailAddress(userEmail, userEmail);
+
+                    const string fromPassword = "xlmvtklkuclzopbh";
+
+                    const string subject = "Şifre Hatırlatma Maili";
+
+                    string body = yazi;
+
+                    var smtp = new SmtpClient
+
+                    {
+                        Host = "smtp.gmail.com",
+                        Port = 587,
+                        EnableSsl = true,
+                        DeliveryMethod = SmtpDeliveryMethod.Network,
+                        UseDefaultCredentials = false,
+                        Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+
+                    };
+
+                    using (var message = new MailMessage(fromAddress, toAddress)
+
+                    {
+                        Subject = subject,
+                        Body = body
+                    })
+
+                    {
+                        smtp.Send(message);
+                    }
+
+                }
+
+            }
+            catch (Exception) { }
+        }
     }
+    //[HttpGet("getPharmacyNameFromId")]
+    //public IActionResult getPharmacyNameFromId(int userId)
+    //{
+    //    try
+    //    {
+
+    //        using (var db = new DataContext())
+    //        {
+    //            var getFromDb = db.users.First(item => item.id == userId);
+    //            if (getFromDb != null)
+    //            {
+    //                var stringResult = getFromDb.name + " " + getFromDb.surname;
+    //                return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
+    //            }
+    //            else
+    //            {
+    //                return NotFound();
+    //            }
+    //        }
+
+    //    }
+    //    catch (Exception ex)
+    //    {
+
+    //        return BadRequest(ex.Message);
+    //    }
+
+    //}
 }
+

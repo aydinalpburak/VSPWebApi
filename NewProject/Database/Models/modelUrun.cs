@@ -60,7 +60,7 @@ namespace VSPWebApi.API.Database.Models
 
         public class EczaneKonumlari
         {
-            [Key]
+           
             public decimal latitude { get; set; }
             public decimal longitude { get; set; }
             public decimal latitudeDelta { get; set; }
@@ -68,6 +68,9 @@ namespace VSPWebApi.API.Database.Models
             public string? eczanetelefon { get; set; }
             public string? eczaneismi { get; set; }
             public string? eczaneadress { get; set; }
+            [Key]
+            public int? eczaneid { get; set; }
+
         }
 
 
@@ -136,22 +139,24 @@ namespace VSPWebApi.API.Database.Models
         }
         public class UserLogin 
         {
-            public string? accesslevel { get; set; }
             public string? name { get; set; }
-            public string? surname { get; set; }
-            public string? prescriptionInfo { get; set; }
-            [Key]        
-            public string tc { get; set; }
+            public string? surname { get; set; }        
+            public string? tc { get; set; }
             public string? password { get; set; }
             public string? address { get; set; }
-
-            public int id { get; set; }
+            [Key]
+            public int id { get; set; } 
             public string? email { get; set; }
             public string? phonenumber { get; set; }
         }
         public class UserLoginDTO
         {
             public string email { get; set; }
+            public string password { get; set; }
+        }
+        public class UserLoginWpfDTO
+        {
+            public int id { get; set; }
             public string password { get; set; }
         }
         public class MyTableToWpf
@@ -168,6 +173,13 @@ namespace VSPWebApi.API.Database.Models
             public int urunid { get; set; }
             public int urunstok { get; set; }           
             public int isupdate { get; set; }
+        }
+        public class EczaneLogin
+        {
+            [Key]
+            public int? eczaneid { get; set; }
+            public string? eczanesifre { get; set; }
+
         }
     }
 }
