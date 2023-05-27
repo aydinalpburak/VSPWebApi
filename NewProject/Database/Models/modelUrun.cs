@@ -162,5 +162,12 @@ namespace VSPWebApi.API.Database.Models
             public string? author { get; set; }
             public string? image1 { get; set; }
         }
+        public class updateStockDto 
+        {
+            public int eczaneid { get; set; }
+            public int urunid { get; set; }
+            public int urunstok { get; set; }           
+            public int isupdate { get; set; }
+        }
     }
 }

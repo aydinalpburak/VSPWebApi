@@ -136,6 +136,73 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpPost("updateAndGetStock")]
+        public IActionResult updateAndGetStock(updateStockDto x)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.eczanevestokbilgisi.First(item => item.eczaneid == x.eczaneid);
+                    if (x.isupdate == 1)
+                    {
+                        if (getFromDb != null)
+                        {
+                            var temp = getFromDb.ilacvestok;
+                            for (int i = 0; i < temp.Count; i++)
+                            {
+                                if (temp[i].id == x.urunid)
+                                {
+                                    temp[i].count = x.urunstok;
+                                }
+                            }
+                            getFromDb.ilacvestok = new List<StokBilgisi>(temp);
+                            db.SaveChanges();
+                        }                   
+                    }
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                    //for (int kk = 0; kk < getFromDb.Count; kk++)
+                    //{
+                    //    if (getFromDb[kk].eczaneid == 123)
+                    //    {
+                    //        for (int i = 0; i < getFromDb[kk].ilacvestok.Count; i++)
+                    //        {
+                    //            if (getFromDb[kk].ilacvestok[i].id == 66)
+                    //            {
+                    //                getFromDb[kk].ilacvestok[i].count = 0;
+                    //                break;
+                    //            }
+                    //        }
+                    //    }
+
+                    //}
+                    //Console.WriteLine();              
+                    //foreach (var item in getFromDb.First(x => x.eczaneid == 123).ilacvestok)
+                    //{
+                    //    if (item.id == 66)
+                    //    {
+                    //        item.id = 0;
+
+                    //    }
+                    //}
+                    //getFromDb = getFromDb.Where(e => e.ilacvestok.Any(i => i.id == id && i.count > 0)).ToList();
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpPost("addNewProduct")]
         public async Task<IActionResult> AddNewProduct(Root data)
         {
