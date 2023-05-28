@@ -206,6 +206,42 @@ namespace NewProject.API.Controllers
 
         }
 
+
+        [HttpPost("updatePassword")]
+        public IActionResult updatePassword(updatePassDTO x)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.users.First(item => item.email == x.email && item.id == x.userid && item.password == x.oldPass);
+                    if (getFromDb != null)
+                    {
+                        getFromDb.password = x.newPass;
+                        db.SaveChanges();
+                        return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpPost("addNewProduct")]
         public async Task<IActionResult> AddNewProduct(Root data)
         {
@@ -593,6 +629,35 @@ namespace NewProject.API.Controllers
                     if (getFromDb != null)
                     {
                         var stringResult = getFromDb.name + " " + getFromDb.surname;
+                        return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+
+        [HttpGet("getMedicineNameFromId")]
+        public IActionResult getMedicineNameFromId(int id)
+        {
+            try
+            {
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.mytable.First(item => item.id == id);
+                    if (getFromDb != null)
+                    {
+                        var stringResult = getFromDb.name;
                         return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
                     }
                     else

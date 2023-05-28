@@ -122,13 +122,15 @@ namespace VSPWebApi.API.Database.Models
             [Key]
             public long orderid { get; set; }
             public string? adress { get; set; }
-
             [Column(TypeName = "jsonb")]
             public IList<StokBilgisiSparis> medicines { get; set; }
-
             public int userid { get; set; }
-
             public string? ordertype { get; set; }
+            public string? date { get; set; }
+            public string? status { get; set; }
+            public string? phonenumber { get; set; }
+            public string? lat { get; set; }
+            public string? longt { get; set; }
         }
         public class StokBilgisiSparis
         {
@@ -174,12 +176,24 @@ namespace VSPWebApi.API.Database.Models
             public int urunstok { get; set; }           
             public int isupdate { get; set; }
         }
+        public class updatePassDTO 
+        {
+            public int userid { get; set; }
+            public string oldPass { get; set; }
+            public string newPass { get; set; }
+            public string email { get; set; }
+
+        }
         public class EczaneLogin
         {
             [Key]
             public int? eczaneid { get; set; }
             public string? eczanesifre { get; set; }
 
+        }
+        public class KuryeNavigasyon 
+        {
+                        
         }
     }
 }
