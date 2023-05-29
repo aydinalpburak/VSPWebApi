@@ -51,6 +51,31 @@ namespace NewProject.API.Controllers
             }
 
         }
+        [HttpGet("getAllocationWithId")]
+        public IActionResult getAllocation(int eczaneid)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.eczanekonumlari.First(item => item.eczaneid == eczaneid);
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
 
         [HttpGet("getAllProducts")]
         public IActionResult getAllProducts()
@@ -66,6 +91,31 @@ namespace NewProject.API.Controllers
                 using (var db = new DataContext())
                 {
                     var getFromDb = db.mytable.FromSqlRaw("SELECT * FROM mytable").ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
+        [HttpGet("getAllOrdersKurye")]
+        public IActionResult getAllOrdersKurye()
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.kuryenavigasyon.ToList();
                     return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
 
@@ -251,6 +301,33 @@ namespace NewProject.API.Controllers
                 try
                 {
                     db.mytable.AddAsync(data);
+                    await db.SaveChangesAsync();
+
+                    var response = new returnClassModel()
+                    {
+                        message = "Islem Basarili Bir Sekilde Gerceklesti",
+                        response = "Urun Basarili Bir Sekilde Eklendi",
+                        status_code = Ok().StatusCode.ToString(),
+                    };
+                    return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+
+        }
+        [HttpPost("addNewKurye")]
+        public async Task<IActionResult> addNewKurye(KuryeNavigasyon data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    db.kuryenavigasyon.AddAsync(data);
                     await db.SaveChangesAsync();
 
                     var response = new returnClassModel()

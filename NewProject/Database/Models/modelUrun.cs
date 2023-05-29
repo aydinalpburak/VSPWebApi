@@ -193,7 +193,16 @@ namespace VSPWebApi.API.Database.Models
         }
         public class KuryeNavigasyon 
         {
-                        
+
+            public int? kuryeid{ get; set; }
+            [Key]
+            public int? pkeys { get; set; }
+            public string? userlong{ get; set; }
+            public string? userlat{ get; set; }
+            public string? eczanelong { get; set; }
+            public string? eczanelat { get; set; }
+            public int? orderid { get; set; }
+            public int? eczaneid { get; set; }
         }
     }
 }
