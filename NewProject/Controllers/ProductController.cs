@@ -503,6 +503,31 @@ namespace NewProject.API.Controllers
             }
 
         }
+        [HttpGet("getInfoKuryeCardFromOrderId")]
+        public IActionResult getInfoKuryeCardFromOrderId(int orderid)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.orders.First(item => item.orderid == orderid);
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
 
         [HttpGet("getFavoritesProducts")]
         public IActionResult getFavoritesProducts(int id)
