@@ -142,7 +142,8 @@ namespace NewProject.API.Controllers
                 using (var db = new DataContext())
                 {
                     var getFromDb = db.mytable
-                        .Select(x => new MyTableToWpf { 
+                        .Select(x => new MyTableToWpf
+                        {
                             author = x.author,
                             description = x.description,
                             id = x.id,
@@ -217,34 +218,9 @@ namespace NewProject.API.Controllers
                             }
                             getFromDb.ilacvestok = new List<StokBilgisi>(temp);
                             db.SaveChanges();
-                        }                   
+                        }
                     }
                     return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
-                    //for (int kk = 0; kk < getFromDb.Count; kk++)
-                    //{
-                    //    if (getFromDb[kk].eczaneid == 123)
-                    //    {
-                    //        for (int i = 0; i < getFromDb[kk].ilacvestok.Count; i++)
-                    //        {
-                    //            if (getFromDb[kk].ilacvestok[i].id == 66)
-                    //            {
-                    //                getFromDb[kk].ilacvestok[i].count = 0;
-                    //                break;
-                    //            }
-                    //        }
-                    //    }
-
-                    //}
-                    //Console.WriteLine();              
-                    //foreach (var item in getFromDb.First(x => x.eczaneid == 123).ilacvestok)
-                    //{
-                    //    if (item.id == 66)
-                    //    {
-                    //        item.id = 0;
-
-                    //    }
-                    //}
-                    //getFromDb = getFromDb.Where(e => e.ilacvestok.Any(i => i.id == id && i.count > 0)).ToList();
                 }
 
             }
@@ -411,7 +387,7 @@ namespace NewProject.API.Controllers
 
                 try
                 {
-                    var getFromDb = db.users.Where(item => item.password == data.password && item.email==data.email).ToList();
+                    var getFromDb = db.users.Where(item => item.password == data.password && item.email == data.email).ToList();
                     return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
                 }
                 catch (Exception ex)
@@ -542,14 +518,14 @@ namespace NewProject.API.Controllers
 
                 using (var db = new DataContext())
                 {
-                  var result = db.mytable
-                  .Join(db.favoriler,
-                      t1 => t1.id,
-                      t2 => t2.productid,
-                      (t1, t2) => new { T1 = t1, T2 = t2 })
-                  .Where(x => x.T2.userid == id)
-                  .ToList();
-                   return Ok(JsonConvert.SerializeObject(result, Formatting.Indented));
+                    var result = db.mytable
+                    .Join(db.favoriler,
+                        t1 => t1.id,
+                        t2 => t2.productid,
+                        (t1, t2) => new { T1 = t1, T2 = t2 })
+                    .Where(x => x.T2.userid == id)
+                    .ToList();
+                    return Ok(JsonConvert.SerializeObject(result, Formatting.Indented));
                 }
 
             }
@@ -793,7 +769,7 @@ namespace NewProject.API.Controllers
                     if (getFromDb)
                     {
                         var tempObject = db.users.First(item => item.email == email);
-                        string passString = "Merhaba " + tempObject.name+" "+ tempObject.surname +","+"\n\n" +
+                        string passString = "Merhaba " + tempObject.name + " " + tempObject.surname + "," + "\n\n" +
                         "Şifreniz: " + tempObject.password +
                         "\n\nUygulamaya giriş yaptıktan sonra lütfen şifrenizi değiştiriniz!" +
                         "\n\n\nSağlıklı günler dileriz." +
@@ -902,8 +878,42 @@ namespace NewProject.API.Controllers
             }
 
         }
+
+        [HttpGet("getMaxStock")]
+        public IActionResult getMaxStock(int pharmacyid, int foodid)
+        {
+            try
+            {
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.eczanevestokbilgisi.First(item => item.eczaneid == pharmacyid);
+
+                    if (getFromDb != null)
+                    {
+                        var temp = getFromDb.ilacvestok;
+                        for (int i = 0; i < temp.Count; i++)
+                        {
+                            if (temp[i].id == foodid)
+                            {
+                                return Ok(temp[i].count);
+                            }
+                        }
+
+                    }
+
+                    return NotFound();
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
     }
 
-    
+
 }
 
