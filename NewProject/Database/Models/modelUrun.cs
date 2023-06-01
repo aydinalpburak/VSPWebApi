@@ -203,6 +203,7 @@ namespace VSPWebApi.API.Database.Models
             public string? eczanelat { get; set; }
             public int? orderid { get; set; }
             public int? eczaneid { get; set; }
+            public string? teslimdurumu { get; set; }
         }
     }
 }

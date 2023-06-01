@@ -859,34 +859,51 @@ namespace NewProject.API.Controllers
             }
             catch (Exception) { }
         }
+
+        [HttpGet("updateKuryeSiparisDurumu")]
+        public IActionResult updateKuryeSiparisDurumu(int pkeys)
+        {
+            try
+            {
+                //var token = _jwtService.Verify(Request.Cookies["Authorization"]);
+                //if (token.Issuer != Constants.username)
+                //{
+                //    return Unauthorized();
+                //}
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.kuryenavigasyon.First(item => item.pkeys == pkeys);
+                    if (getFromDb != null)
+                    {
+                        getFromDb.teslimdurumu = "true";
+                        db.SaveChanges();
+                        var countDB = db.kuryenavigasyon.Where(item => item.teslimdurumu == "false" && item.orderid == getFromDb.orderid).ToList().Count;
+                        if (countDB == 0)
+                        {
+                            var getFromOrders = db.orders.First(item => item.orderid == getFromDb.orderid);
+                            getFromOrders.status = "Teslim Edildi";
+                            db.SaveChanges();
+                            Console.WriteLine("Yenilendi");
+                        }
+                        return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
     }
-    //[HttpGet("getPharmacyNameFromId")]
-    //public IActionResult getPharmacyNameFromId(int userId)
-    //{
-    //    try
-    //    {
 
-    //        using (var db = new DataContext())
-    //        {
-    //            var getFromDb = db.users.First(item => item.id == userId);
-    //            if (getFromDb != null)
-    //            {
-    //                var stringResult = getFromDb.name + " " + getFromDb.surname;
-    //                return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
-    //            }
-    //            else
-    //            {
-    //                return NotFound();
-    //            }
-    //        }
-
-    //    }
-    //    catch (Exception ex)
-    //    {
-
-    //        return BadRequest(ex.Message);
-    //    }
-
-    //}
+    
 }
 
