@@ -752,6 +752,34 @@ namespace NewProject.API.Controllers
             }
 
         }
+        [HttpGet("getPharmacyFromUserId")]
+        public IActionResult getPharmacyFromUserId(int id)
+        {
+            try
+            {
+
+                using (var db = new DataContext())
+                {
+                    var getFromDb = db.eczanekonumlari.First(item => item.eczaneid == id);
+                    if (getFromDb != null)
+                    {
+                        var stringResult = getFromDb.eczaneismi;
+                        return Ok(JsonConvert.SerializeObject(stringResult, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(ex.Message);
+            }
+
+        }
         [HttpGet("getSendMailPass")]
         public IActionResult getSendMailPass(string email)
         {
