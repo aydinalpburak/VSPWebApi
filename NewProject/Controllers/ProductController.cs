@@ -303,6 +303,10 @@ namespace NewProject.API.Controllers
 
                 try
                 {
+                    var isFound = db.kuryenavigasyon.Any(item => item.eczaneid == data.eczaneid && item.orderid == data.orderid);
+                    if (isFound) {
+                        return BadRequest("Zaten Cagirildi");
+                    }
                     db.kuryenavigasyon.AddAsync(data);
                     await db.SaveChangesAsync();
 
@@ -341,6 +345,50 @@ namespace NewProject.API.Controllers
                         status_code = Ok().StatusCode.ToString(),
                     };
                     return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+
+            }
+
+        }
+        [HttpPost("updateUserInfo")]
+        public async Task<IActionResult> updateUserInfo(UserLogin data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    var isFound = db.users.First(item => item.id == data.id);
+                    if (isFound != null) 
+                    {
+                        isFound.name = data.name;
+                        isFound.surname = data.surname;
+                        isFound.tc = data.tc;   
+                        isFound.address = data.address;
+                        isFound.email = data.email;
+                        isFound.phonenumber = data.phonenumber;
+                        isFound.hastaliklar = data.hastaliklar;
+                        isFound.bdate = data.bdate;
+                        isFound.candc = data.candc;
+                        db.SaveChanges();
+                        var response = new returnClassModel()
+                        {
+                            message = "Islem Basarili Bir Sekilde Gerceklesti",
+                            response = "Bilgiler Basarili Bir Sekilde Guncellendi",
+                            status_code = Ok().StatusCode.ToString(),
+                        };
+                        return Ok(JsonConvert.SerializeObject(response, Formatting.Indented));
+                    }
+                    else
+                    {
+                        return NotFound();
+                    }
+
+
                 }
                 catch (Exception ex)
                 {

@@ -150,6 +150,13 @@ namespace VSPWebApi.API.Database.Models
             public int id { get; set; } 
             public string? email { get; set; }
             public string? phonenumber { get; set; }
+            public string? hastaliklar { get; set; }
+            public string? bdate { get; set; }
+
+            public string? candc { get; set; }
+
+
+
         }
         public class UserLoginDTO
         {
