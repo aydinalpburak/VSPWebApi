@@ -407,6 +407,26 @@ namespace NewProject.API.Controllers
 
                 try
                 {
+                    //stoktan dusme 
+                    var medicines = data.medicines;
+                    foreach (var currMedicines in medicines)
+                    {
+                        var getFromDb = db.eczanevestokbilgisi.First(item => item.eczaneid == currMedicines.pharmacyid);
+                        if (getFromDb != null)
+                        {
+                            var temp = getFromDb.ilacvestok;
+                            for (int i = 0; i < temp.Count; i++)
+                            {
+                                if (temp[i].id == currMedicines.id)
+                                {
+                                    temp[i].count -= currMedicines.count;
+                                }
+                            }
+                            getFromDb.ilacvestok = new List<StokBilgisi>(temp);
+                            db.SaveChanges();
+                        }
+                    }
+                    //sparisi olusturma
                     db.orders.AddAsync(data);
                     await db.SaveChangesAsync();
 
