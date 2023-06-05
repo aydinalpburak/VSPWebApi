@@ -50,6 +50,8 @@ namespace NewProject.Database
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.UserLogin> users { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.EczaneLogin> pharmacists { get; set; } = null!;
         public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.KuryeNavigasyon> kuryenavigasyon { get; set; } = null!;
+        public DbSet<VSPWebApi.API.Database.Models.eczane_tracker.KuryeLogin> kuryelogin { get; set; } = null!;
+
 
 
 

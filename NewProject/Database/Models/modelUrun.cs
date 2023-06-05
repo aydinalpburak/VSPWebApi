@@ -212,5 +212,11 @@ namespace VSPWebApi.API.Database.Models
             public int? eczaneid { get; set; }
             public string? teslimdurumu { get; set; }
         }
+        public class KuryeLogin
+        {
+            [Key]
+            public int? id { get; set; }
+            public string password { get; set; }
+        }
     }
 }

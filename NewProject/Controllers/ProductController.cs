@@ -447,6 +447,26 @@ namespace NewProject.API.Controllers
 
         }
 
+        [HttpPost("postKuryeLogin")]
+        public async Task<IActionResult> postKuryeLogin(KuryeLogin data)
+        {
+            using (var db = new DataContext())
+            {
+
+                try
+                {
+                    var getFromDb = db.kuryelogin.Where(item => item.password == data.password && item.id == data.id).ToList();
+                    return Ok(JsonConvert.SerializeObject(getFromDb, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(ex.InnerException);
+                }
+
+            }
+
+        }
+
         [HttpPost("postLoginPharmacy")]
         public async Task<IActionResult> postLoginPharmacy(UserLoginWpfDTO data)
         {
